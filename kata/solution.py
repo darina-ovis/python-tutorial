@@ -11,6 +11,3 @@ def final_value_after_operations(operations: List[str]) -> int:
         else:
             x = x - 1
     return x
-
-
-
