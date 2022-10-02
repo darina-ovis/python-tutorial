@@ -1,5 +1,4 @@
 from typing import List
-import re
 
 
 # Leetcode #2011. Final Value of Variable After Performing Operations
@@ -14,8 +13,4 @@ def final_value_after_operations(operations: List[str]) -> int:
     return x
 
 
-def phone_number_verify(phones: List[str]) -> List[bool]:
-    result: List[bool] = []
-    for phone in phones:
-        result.append(re.match("[7-8][0-9]{9}$", phone) is not None)
-    return result
+

@@ -1,6 +1,6 @@
 from typing import List
 
-from kata.solution import phone_number_verify
+from kata.phone_number import phone_number_verify
 import codewars_test as test
 
 # ['89112360136', '9112360136', '911-234-12-45', '71q23455678']
