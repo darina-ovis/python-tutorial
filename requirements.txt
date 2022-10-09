@@ -1,1 +1,2 @@
 codewars-test-teey == 0.1.0
+pgzero~=1.2.1
