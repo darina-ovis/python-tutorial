@@ -26,11 +26,6 @@ from_dark_to_light = True
 DARK_RED_COLOUR = 139, 0, 0
 ground = Rect((0, HEIGHT - 100), (WIDTH, 100))
 
-forest = []
-for i in range(18):
-    forest.append(
-        Actor('cactus', topleft=(images.cactus.get_width() * i + 10, HEIGHT - images.grass.get_height() - 100))
-    )
 
 stars = []
 for i in range(10):
@@ -45,9 +40,6 @@ def draw():
     screen.fill(sky_color)
     screen.blit('background_tr', (0, 0))
     screen.draw.rect(ground, DARK_RED_COLOUR)
-
-    for grass in forest:
-        grass.draw()
 
     for star in stars:
         star.draw()
