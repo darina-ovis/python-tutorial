@@ -28,10 +28,22 @@ ground = Rect((0, HEIGHT - 100), (WIDTH, 100))
 
 
 stars = []
-for i in range(10):
+for i in range(30):
     stars.append(
         Actor('star', topleft=(random.randint(0, 200) * i, random.randint(0, 400)))
     )
+clouds = []
+for i in range(40):
+    clouds.append(
+        Actor('cloud' if i % 2 == 0 else 'cloud-2', topleft=(random.randint(100, 200) * i, random.randint(0, 400)))
+    )
+
+cactuses = []
+for i in range(3):
+    cactuses.append(
+        Actor('cactus', bottomleft=(400 * i, HEIGHT - 100))
+    )
+
 
 
 def draw():
@@ -43,6 +55,11 @@ def draw():
 
     for star in stars:
         star.draw()
+    for cloud in clouds:
+        cloud.draw()
+
+    for cactus in cactuses:
+        cactus.draw()
 
     player.draw()
 
@@ -50,6 +67,7 @@ def draw():
 def update():
     global is_moving_to_right, ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light
 
+    # sky
     if (from_dark_to_light):
         sky_color_blue = (sky_color_blue + 1) % 255
         sky_color_red = (sky_color_red + 1) % 255
@@ -63,8 +81,19 @@ def update():
         if sky_color_green == 0:
             from_dark_to_light = True
 
-    print(sky_color_green)
+    for cloud in clouds:
+        if cloud.right <= 0:
+            cloud.left = WIDTH
+        if cloud.image == 'cloud':
+            cloud.x -= 1
+        else:
+            cloud.x -= 2
 
+    for star in stars:
+        star.angle += 1
+
+
+    # player
     step = 3
     if is_moving_to_right:
         player.x += step
