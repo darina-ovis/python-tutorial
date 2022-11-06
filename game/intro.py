@@ -1,13 +1,14 @@
 import random
 
 import pgzrun
-import pygame
 
 from pgzero.actor import Actor
-from pgzero.animation import animate, decelerate
+from pgzero.animation import animate
 from pgzero.clock import clock
-from pgzero.loaders import sounds, images
+from pgzero.loaders import sounds
 from pgzero.rect import Rect
+
+from game.star import Star
 
 JUMP_HIGHT = 80
 
@@ -26,12 +27,10 @@ from_dark_to_light = True
 DARK_RED_COLOUR = 139, 0, 0
 ground = Rect((0, HEIGHT - 100), (WIDTH, 100))
 
-
 stars = []
 for i in range(30):
-    stars.append(
-        Actor('star', topleft=(random.randint(0, 200) * i, random.randint(0, 400)))
-    )
+    stars.append(Star('star.png', (random.randint(0, 200) * i, random.randint(0, 400))))
+
 clouds = []
 for i in range(40):
     clouds.append(
@@ -45,7 +44,6 @@ for i in range(3):
     )
 
 
-
 def draw():
     screen.clear()
     sky_color = (sky_color_red, sky_color_green, sky_color_blue)
@@ -54,7 +52,8 @@ def draw():
     screen.draw.rect(ground, DARK_RED_COLOUR)
 
     for star in stars:
-        star.draw()
+        screen.blit(star.image, star.position)
+
     for cloud in clouds:
         cloud.draw()
 
@@ -90,8 +89,7 @@ def update():
             cloud.x -= 2
 
     for star in stars:
-        star.angle += 1
-
+        star.change_transparency(from_dark_to_light)
 
     # player
     step = 3
@@ -127,8 +125,6 @@ def jump():
 
 def set_alien_hurt():
     player.image = 'player_red'
-    # circle.angle += 180
-    # circle.y -= 20
     sounds.eep.play()
     clock.schedule_unique(set_alien_normal, 0.2)
 
