@@ -9,7 +9,7 @@ from pgzero.clock import clock
 from pgzero.loaders import sounds, images
 from pgzero.rect import Rect
 
-JUMP_HIGHT = 120
+JUMP_HIGHT = 200
 
 HEIGHT = 720  # ось Y
 WIDTH = 1280  # ось X
@@ -18,6 +18,7 @@ player = Actor(PLAYER_IMAGE)
 # circle._surf = pygame.transform.scale(circle._surf, (100, 100))
 player.pos = 600, 500
 is_moving_to_right = True
+is_jumping = False
 sky_color_red = 0
 sky_color_green = 0
 sky_color_blue = 100
@@ -47,7 +48,7 @@ def draw():
     screen.clear()
     sky_color = (sky_color_red, sky_color_green, sky_color_blue)
     screen.fill(sky_color)
-    screen.blit('background_tr', (0, 0))
+    screen.blit('zima', (0, 0))
     screen.draw.rect(ground, DARK_RED_COLOUR)
 
     for star in stars:
@@ -62,7 +63,7 @@ def draw():
 
 
 def update():
-    global is_moving_to_right, ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light
+    global is_moving_to_right, ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, is_jumping
 
     # sky
     if from_dark_to_light:
@@ -89,18 +90,28 @@ def update():
     for star in stars:
         star.angle += 1
 
+        print(is_jumping)
+
     # player
     step = 3
     if is_moving_to_right:
         player.x += step
     else:
         player.x -= step
-    alien_half_width = player.width / 2
-    if player.x > WIDTH - alien_half_width or player.x < alien_half_width:
+    player_half_width = player.width / 2
+    if player.x > WIDTH - player_half_width or player.x < player_half_width:
         is_moving_to_right = not is_moving_to_right
         flip_image()
-    if not player.colliderect(ground):
-        player.y += step
+    if not player.colliderect(ground) or is_jumping:
+        if not is_jumping:
+            player.y -= step
+
+        if player.y >= HEIGHT-100-JUMP_HIGHT:
+            is_jumping = False
+            player.image = 'snowman_down'
+        else:
+            player.y -= -2
+
     else:
         flip_image()
 
@@ -124,20 +135,20 @@ def on_mouse_down(pos):
 
 def on_key_up(key):
     if key == keys.UP:
-        animate(player, 'decelerate', 2, jump())
+        animate(player, 'decelerate', 4, jump())
 
 
 def jump():
+    global is_jumping
     if player.colliderect(ground):
-        player.y -= JUMP_HIGHT
         player.image = "snowman_up"
-
+        is_jumping = True
 
 def set_player_hurt():
     player.image = 'snowman_hurt'
     # circle.angle += 180
     # circle.y -= 20
-    sounds.eep.play()
+    # sounds.eep.play()
     clock.schedule_unique(set_player_normal, 0.2)
 
 
