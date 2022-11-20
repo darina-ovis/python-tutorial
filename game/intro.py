@@ -38,9 +38,9 @@ for i in range(40):
     )
 
 torches = []
-for i in range(4):
+for i in range(3):
     torches.append(
-        Actor('torch', bottomleft=(400 * i, HEIGHT - 100))
+        Actor('torch', bottomleft=(100+400 * i, HEIGHT - 100))
     )
 
 
@@ -48,11 +48,13 @@ def draw():
     screen.clear()
     sky_color = (sky_color_red, sky_color_green, sky_color_blue)
     screen.fill(sky_color)
-    screen.blit('zima', (0, 0))
     screen.draw.rect(ground, DARK_RED_COLOUR)
 
     for star in stars:
         star.draw()
+
+    screen.blit('zima', (0, 0))
+
     for cloud in clouds:
         cloud.draw()
 
@@ -90,8 +92,6 @@ def update():
     for star in stars:
         star.angle += 1
 
-        print(is_jumping)
-
     # player
     step = 3
     if is_moving_to_right:
@@ -104,13 +104,14 @@ def update():
         flip_image()
     if not player.colliderect(ground) or is_jumping:
         if not is_jumping:
-            player.y -= step
+            player.y += step
 
-        if player.y >= HEIGHT-100-JUMP_HIGHT:
+        if player.y <= HEIGHT-100-JUMP_HIGHT:
             is_jumping = False
-            player.image = 'snowman_down'
+            player.image = 'snowman_down' if is_moving_to_right else 'snowman_down_left'
+            print(f"is_moving_to_right {is_moving_to_right} {player.image}")
         else:
-            player.y -= -2
+            player.y -= 2
 
     else:
         flip_image()
@@ -121,11 +122,13 @@ def update():
 
 
 def flip_image():
-    if is_moving_to_right:
-        current_player_image = PLAYER_IMAGE
-    else:
-        current_player_image = "snowman_left"
-    player.image = current_player_image
+    global is_moving_to_right
+    if player.colliderect(ground):
+        if is_moving_to_right:
+            current_player_image = PLAYER_IMAGE
+        else:
+            current_player_image = "snowman_left"
+        player.image = current_player_image
 
 
 def on_mouse_down(pos):
@@ -139,9 +142,10 @@ def on_key_up(key):
 
 
 def jump():
-    global is_jumping
+    global is_jumping, is_moving_to_right
     if player.colliderect(ground):
-        player.image = "snowman_up"
+        player.image = "snowman_up"  if is_moving_to_right else 'snowman_up_left'
+        print(f"is_moving_to_right {is_moving_to_right} {player.image}")
         is_jumping = True
 
 def set_player_hurt():
