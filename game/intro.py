@@ -9,6 +9,9 @@ from pgzero.clock import clock
 from pgzero.loaders import sounds, images
 from pgzero.rect import Rect
 
+from game.star import Star
+
+JUMP_HIGHT = 80
 JUMP_HIGHT = 200
 
 HEIGHT = 720  # ось Y
@@ -26,9 +29,8 @@ ground = Rect((0, HEIGHT - 100), (WIDTH, 100))
 
 stars = []
 for i in range(30):
-    stars.append(
-        Actor('star', topleft=(random.randint(0, 200) * i, random.randint(0, 400)))
-    )
+    stars.append(Star('star.png', (random.randint(0, 200) * i, random.randint(0, 400))))
+
 clouds = []
 for i in range(40):
     clouds.append(
@@ -49,7 +51,7 @@ def draw():
     screen.draw.rect(ground, DARK_RED_COLOUR)
 
     for star in stars:
-        star.draw()
+        screen.blit(star.image, star.position)
 
     screen.blit('zima', (0, 0))
 
@@ -88,7 +90,7 @@ def update():
             cloud.x -= 2
 
     for star in stars:
-        star.angle += 1
+        star.change_transparency(from_dark_to_light)
 
     # player
     step = 3
