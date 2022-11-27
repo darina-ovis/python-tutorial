@@ -1,7 +1,7 @@
 import random
-
 import pgzrun
 import pygame
+from snowman import Snowman
 
 from pgzero.actor import Actor
 from pgzero.animation import animate, decelerate
@@ -14,11 +14,9 @@ JUMP_HIGHT = 200
 HEIGHT = 720  # ось Y
 WIDTH = 1280  # ось X
 PLAYER_IMAGE = 'snowman_right'
-player = Actor(PLAYER_IMAGE)
+player = Snowman(PLAYER_IMAGE)
 # circle._surf = pygame.transform.scale(circle._surf, (100, 100))
 player.pos = 600, 500
-is_moving_to_right = True
-is_jumping = False
 sky_color_red = 0
 sky_color_green = 0
 sky_color_blue = 100
@@ -65,7 +63,7 @@ def draw():
 
 
 def update():
-    global is_moving_to_right, ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, is_jumping
+    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light
 
     # sky
     if from_dark_to_light:
@@ -94,22 +92,22 @@ def update():
 
     # player
     step = 3
-    if is_moving_to_right:
+    if player.is_moving_to_right:
         player.x += step
     else:
         player.x -= step
     player_half_width = player.width / 2
     if player.x > WIDTH - player_half_width or player.x < player_half_width:
-        is_moving_to_right = not is_moving_to_right
+        player.is_moving_to_right = not player.is_moving_to_right
         flip_image()
-    if not player.colliderect(ground) or is_jumping:
-        if not is_jumping:
+    if not player.colliderect(ground) or player.is_jumping:
+        if not player.is_jumping:
             player.y += step
 
         if player.y <= HEIGHT-100-JUMP_HIGHT:
-            is_jumping = False
-            player.image = 'snowman_down' if is_moving_to_right else 'snowman_down_left'
-            print(f"is_moving_to_right {is_moving_to_right} {player.image}")
+            player.is_jumping = False
+            player.image = 'snowman_down' if player.is_moving_to_right else 'snowman_down_left'
+            print(f"player.is_moving_to_right {player.is_moving_to_right} {player.image}")
         else:
             player.y -= 2
 
@@ -122,9 +120,8 @@ def update():
 
 
 def flip_image():
-    global is_moving_to_right
     if player.colliderect(ground):
-        if is_moving_to_right:
+        if player.is_moving_to_right:
             current_player_image = PLAYER_IMAGE
         else:
             current_player_image = "snowman_left"
@@ -138,26 +135,17 @@ def on_mouse_down(pos):
 
 def on_key_up(key):
     if key == keys.UP:
-        animate(player, 'decelerate', 4, jump())
+        player.jump(ground)
 
-
-def jump():
-    global is_jumping, is_moving_to_right
-    if player.colliderect(ground):
-        player.image = "snowman_up"  if is_moving_to_right else 'snowman_up_left'
-        print(f"is_moving_to_right {is_moving_to_right} {player.image}")
-        is_jumping = True
 
 def set_player_hurt():
     player.image = 'snowman_hurt'
     # circle.angle += 180
     # circle.y -= 20
-    # sounds.eep.play()
     clock.schedule_unique(set_player_normal, 0.2)
 
 
 def set_player_normal():
-    global is_moving_to_right
     flip_image()
     player.angle = 0
     # circle._surf = pygame.transform.scale(circle._surf, (100, 100))
