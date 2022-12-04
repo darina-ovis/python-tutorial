@@ -1,6 +1,8 @@
 import random
 import pgzrun
 import pygame
+
+from game.coin import Coin
 from snowman import Snowman
 
 from pgzero.actor import Actor
@@ -8,6 +10,8 @@ from pgzero.animation import animate, decelerate
 from pgzero.clock import clock
 from pgzero.loaders import sounds, images
 from pgzero.rect import Rect
+
+score = 0
 
 JUMP_HIGHT = 200
 
@@ -41,8 +45,13 @@ for i in range(3):
         Actor('torch', bottomleft=(100+400 * i, HEIGHT - 100))
     )
 
+coins = []
+for i in range(20):
+    coin = Actor('coin', topleft=(random.randint(100, 200) * i, random.randint(300, 600)))
+    coins.append(coin)
 
 def draw():
+    global score
     screen.clear()
     sky_color = (sky_color_red, sky_color_green, sky_color_blue)
     screen.fill(sky_color)
@@ -59,11 +68,16 @@ def draw():
     for torch in torches:
         torch.draw()
 
+    for coin in coins:
+        coin.draw()
+
     player.draw()
+
+    screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=100, color="#312342", shadow=(2,2), scolor="#321243")
 
 
 def update():
-    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light
+    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score
 
     # sky
     if from_dark_to_light:
@@ -117,6 +131,12 @@ def update():
     for torch in torches:
         if player.colliderect(torch):
             set_player_hurt()
+
+    for coin in coins:
+        if player.colliderect(coin):
+            coins.remove(coin)
+            score += 100
+
 
 
 def flip_image():
