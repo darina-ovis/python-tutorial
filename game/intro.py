@@ -40,19 +40,26 @@ for i in range(40):
     )
 
 torches = []
-for i in range(3):
+for i in range(10):
     torches.append(
         Actor('torch', bottomleft=(100+400 * i, HEIGHT - 100))
     )
 
-coins = []
-for i in range(20):
-    coin = Coin(topleft=(random.randint(0, WIDTH - 100), random.randint(300, 600)))
-    coins.append(coin)
+hurt_torch = None
 
+
+def create_coins():
+    global i
+    for i in range(20) :
+        coin = Coin(topleft=(random.randint(0 , WIDTH - 100) , random.randint(300 , 600)))
+        coins.append(coin)
+
+
+coins = []
+create_coins()
 
 def draw():
-    global score
+    global score, hurt_torch
     screen.clear()
     sky_color = (sky_color_red, sky_color_green, sky_color_blue)
     screen.fill(sky_color)
@@ -69,16 +76,26 @@ def draw():
     for torch in torches:
         torch.draw()
 
+    print(hurt_torch)
+    if hurt_torch:
+        screen.draw.text(f"- 15", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676", shadow=(1, 1), scolor="#e28743")
+
+
     for coin in coins:
         coin.draw()
 
     player.draw()
 
     screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
+    if score < 0:
+        screen.draw.text("Всё ты проиграл:(", center=(WIDTH/2, HEIGHT/2), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
 
 
 def update():
-    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score
+    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch
+
+    if score < 0:
+        return
 
     # sky
     if from_dark_to_light:
@@ -130,13 +147,21 @@ def update():
         flip_image()
 
     for torch in torches:
+        torch.x -= 1
+        if torch.x < 0:
+            torch.x += 4000
         if player.colliderect(torch):
             set_player_hurt()
+            score -= 15
+            hurt_torch = torch
 
     for coin in coins:
         if player.colliderect(coin):
             coins.remove(coin)
             score += 100
+    if len(coins) == 0:
+        create_coins()
+
 
 
 def flip_image():
@@ -166,6 +191,8 @@ def set_player_hurt():
 
 
 def set_player_normal():
+    global hurt_torch
+    hurt_torch = None
     flip_image()
     player.angle = 0
 
