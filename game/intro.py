@@ -47,8 +47,9 @@ for i in range(3):
 
 coins = []
 for i in range(20):
-    coin = Actor('coin', topleft=(random.randint(100, 200) * i, random.randint(300, 600)))
+    coin = Coin(topleft=(random.randint(0, WIDTH - 100), random.randint(300, 600)))
     coins.append(coin)
+
 
 def draw():
     global score
@@ -73,7 +74,7 @@ def draw():
 
     player.draw()
 
-    screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=100, color="#312342", shadow=(2,2), scolor="#321243")
+    screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
 
 
 def update():
