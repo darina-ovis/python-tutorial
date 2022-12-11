@@ -13,14 +13,11 @@ from pgzero.rect import Rect
 
 score = 0
 
-JUMP_HIGHT = 200
-
 HEIGHT = 720  # ось Y
 WIDTH = 1280  # ось X
 PLAYER_IMAGE = 'snowman_right'
-player = Snowman(PLAYER_IMAGE)
-# circle._surf = pygame.transform.scale(circle._surf, (100, 100))
-player.pos = 600, 500
+player = Snowman(PLAYER_IMAGE, pos=(500, 600))
+
 sky_color_red = 0
 sky_color_green = 0
 sky_color_blue = 100
@@ -42,21 +39,23 @@ for i in range(40):
 torches = []
 for i in range(10):
     torches.append(
-        Actor('torch', bottomleft=(100+400 * i, HEIGHT - 100))
+        Actor('torch', bottomleft=(100 + 400 * i, HEIGHT - 100))
     )
 
 hurt_torch = None
 
+coin_count = 5
 
-def create_coins():
-    global i
-    for i in range(20) :
-        coin = Coin(topleft=(random.randint(0 , WIDTH - 100) , random.randint(300 , 600)))
+
+def create_coins(coin_number):
+    for i in range(coin_number):
+        coin = Coin(topleft=(random.randint(0, WIDTH - 100), random.randint(300, 600)))
         coins.append(coin)
 
 
 coins = []
-create_coins()
+create_coins(coin_count)
+
 
 def draw():
     global score, hurt_torch
@@ -76,10 +75,9 @@ def draw():
     for torch in torches:
         torch.draw()
 
-    print(hurt_torch)
     if hurt_torch:
-        screen.draw.text(f"- 15", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676", shadow=(1, 1), scolor="#e28743")
-
+        screen.draw.text(f"- 15", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676", shadow=(1, 1),
+                         scolor="#e28743")
 
     for coin in coins:
         coin.draw()
@@ -88,11 +86,12 @@ def draw():
 
     screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
     if score < 0:
-        screen.draw.text("Всё ты проиграл:(", center=(WIDTH/2, HEIGHT/2), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
+        screen.draw.text("Всё ты проиграл:(", center=(WIDTH / 2, HEIGHT / 2), fontsize=70, color="#eab676",
+                         shadow=(1, 1), scolor="#e28743")
 
 
 def update():
-    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch
+    global ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch, coin_count
 
     if score < 0:
         return
@@ -132,19 +131,17 @@ def update():
     if player.x > WIDTH - player_half_width or player.x < player_half_width:
         player.is_moving_to_right = not player.is_moving_to_right
         flip_image()
-    if not player.colliderect(ground) or player.is_jumping:
-        if not player.is_jumping:
-            player.y += step
 
-        if player.y <= HEIGHT-100-JUMP_HIGHT:
+    height_y = 5 * player.y / (HEIGHT - 100 - player.JUMP_HEIGHT)
+    if not player.colliderect(ground) and not player.is_jumping:
+        player.y += height_y
+
+    if player.is_jumping:
+        if player.y <= HEIGHT - 100 - player.JUMP_HEIGHT:
             player.is_jumping = False
             player.image = 'snowman_down' if player.is_moving_to_right else 'snowman_down_left'
-            print(f"player.is_moving_to_right {player.is_moving_to_right} {player.image}")
         else:
-            player.y -= 2
-
-    else:
-        flip_image()
+            player.y -= height_y
 
     for torch in torches:
         torch.x -= 1
@@ -152,7 +149,7 @@ def update():
             torch.x += 4000
         if player.colliderect(torch):
             set_player_hurt()
-            score -= 15
+            # score -= 15
             hurt_torch = torch
 
     for coin in coins:
@@ -160,8 +157,9 @@ def update():
             coins.remove(coin)
             score += 100
     if len(coins) == 0:
-        create_coins()
-
+        coin_count -= 1
+        coin_count = max(coin_count, 1)
+        create_coins(coin_count)
 
 
 def flip_image():

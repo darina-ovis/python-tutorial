@@ -3,6 +3,7 @@ from pgzero.actor import Actor
 
 class Snowman(Actor):
     transparent_step = 2
+    JUMP_HEIGHT = 200
 
     def __init__(self, image, **kwargs):
         super().__init__(image, **kwargs)
