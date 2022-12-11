@@ -139,7 +139,6 @@ def update():
             score += 100
 
 
-
 def flip_image():
     if player.colliderect(ground):
         if player.is_moving_to_right:
@@ -169,7 +168,6 @@ def set_player_hurt():
 def set_player_normal():
     flip_image()
     player.angle = 0
-    # circle._surf = pygame.transform.scale(circle._surf, (100, 100))
 
 
 pgzrun.go()
