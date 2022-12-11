@@ -18,15 +18,15 @@ JUMP_HIGHT = 200
 HEIGHT = 720  # ось Y
 WIDTH = 1280  # ось X
 PLAYER_IMAGE = 'snowman_right'
-player = Snowman(PLAYER_IMAGE)
-# circle._surf = pygame.transform.scale(circle._surf, (100, 100))
-player.pos = 600, 500
+
 sky_color_red = 0
 sky_color_green = 0
 sky_color_blue = 100
 from_dark_to_light = True
 DARK_RED_COLOUR = 139, 0, 0
 ground = Rect((0, HEIGHT - 100), (WIDTH, 100))
+
+player = Snowman(PLAYER_IMAGE, ground=ground, pos=(100, 500), width=WIDTH)
 
 stars = []
 for i in range(30):
@@ -40,15 +40,14 @@ for i in range(40):
     )
 
 torches = []
-for i in range(3):
+for i in range(100):
     torches.append(
-        Actor('torch', bottomleft=(100+400 * i, HEIGHT - 100))
+        Actor('torch', bottomleft=(200 + 400 * i, HEIGHT - 100))
     )
 
 coins = []
 for i in range(20):
-    coin = Coin(topleft=(random.randint(0, WIDTH - 100), random.randint(300, 600)))
-    coins.append(coin)
+    coins.append(Coin(topleft=(random.randint(0, WIDTH - 100), random.randint(300, 600))))
 
 
 def draw():
@@ -78,7 +77,7 @@ def draw():
 
 
 def update():
-    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score
+    global ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score
 
     # sky
     if from_dark_to_light:
@@ -107,10 +106,10 @@ def update():
 
     # player
     step = 3
-    if player.is_moving_to_right:
-        player.x += step
-    else:
-        player.x -= step
+    # if player.is_moving_to_right:
+    #     player.x += step
+    # else:
+    #     player.x -= step
     player_half_width = player.width / 2
     if player.x > WIDTH - player_half_width or player.x < player_half_width:
         player.is_moving_to_right = not player.is_moving_to_right
@@ -119,7 +118,7 @@ def update():
         if not player.is_jumping:
             player.y += step
 
-        if player.y <= HEIGHT-100-JUMP_HIGHT:
+        if player.y <= HEIGHT - 100 - JUMP_HIGHT:
             player.is_jumping = False
             player.image = 'snowman_down' if player.is_moving_to_right else 'snowman_down_left'
             print(f"player.is_moving_to_right {player.is_moving_to_right} {player.image}")
@@ -137,7 +136,6 @@ def update():
         if player.colliderect(coin):
             coins.remove(coin)
             score += 100
-
 
 
 def flip_image():
@@ -159,6 +157,11 @@ def on_key_up(key):
         player.jump(ground)
 
 
+def on_key_down(key):
+    if key == keys.LEFT or key == keys.RIGHT:
+        player.move(key == keys.RIGHT)
+
+
 def set_player_hurt():
     player.image = 'snowman_hurt'
     # circle.angle += 180
@@ -169,7 +172,6 @@ def set_player_hurt():
 def set_player_normal():
     flip_image()
     player.angle = 0
-    # circle._surf = pygame.transform.scale(circle._surf, (100, 100))
 
 
 pgzrun.go()
