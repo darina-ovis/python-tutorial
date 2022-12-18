@@ -13,7 +13,7 @@ from pgzero.rect import Rect
 
 score = 0
 
-JUMP_HIGHT = 200
+JUMP_HEIGHT = 200
 
 HEIGHT = 720  # ось Y
 WIDTH = 1280  # ось X
@@ -46,6 +46,7 @@ for i in range(10):
     )
 
 hurt_torch = None
+torch_fine = 0
 
 
 def create_coins():
@@ -68,7 +69,7 @@ def draw():
     for star in stars:
         star.draw()
 
-    screen.blit('zima', (0, 0))
+    screen.blit('fon_s_elkami', (0, 0))
 
     for cloud in clouds:
         cloud.draw()
@@ -76,9 +77,8 @@ def draw():
     for torch in torches:
         torch.draw()
 
-    print(hurt_torch)
     if hurt_torch:
-        screen.draw.text(f"- 15", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676", shadow=(1, 1), scolor="#e28743")
+        screen.draw.text(f"-{torch_fine}", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676", shadow=(1, 1), scolor="#e28743")
 
 
     for coin in coins:
@@ -92,7 +92,7 @@ def draw():
 
 
 def update():
-    global  ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch
+    global ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch, torch_fine
 
     if score < 0:
         return
@@ -132,19 +132,20 @@ def update():
     if player.x > WIDTH - player_half_width or player.x < player_half_width:
         player.is_moving_to_right = not player.is_moving_to_right
         flip_image()
-    if not player.colliderect(ground) or player.is_jumping:
-        if not player.is_jumping:
-            player.y += step
+    max_height = HEIGHT - 100 - JUMP_HEIGHT
+    velocity = (player.y - max_height)/4
 
-        if player.y <= HEIGHT-100-JUMP_HIGHT:
+    if not player.colliderect(ground) and not player.is_jumping:
+        player.y += velocity
+
+    if player.is_jumping:
+        if round(player.y) <= HEIGHT-100-JUMP_HEIGHT:
             player.is_jumping = False
             player.image = 'snowman_down' if player.is_moving_to_right else 'snowman_down_left'
-            print(f"player.is_moving_to_right {player.is_moving_to_right} {player.image}")
         else:
-            player.y -= 2
-
+            player.y -= velocity
     else:
-        flip_image()
+       flip_image()
 
     for torch in torches:
         torch.x -= 1
@@ -152,7 +153,8 @@ def update():
             torch.x += 4000
         if player.colliderect(torch):
             set_player_hurt()
-            score -= 15
+            score -= torch_fine
+            torch_fine += 1
             hurt_torch = torch
 
     for coin in coins:
