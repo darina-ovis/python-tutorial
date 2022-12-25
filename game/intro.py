@@ -1,6 +1,7 @@
 import random
 import pgzrun
 import pygame
+import time
 
 from game.coin import Coin
 from snowman import Snowman
@@ -12,6 +13,8 @@ from pgzero.loaders import sounds, images
 from pgzero.rect import Rect
 
 score = 0
+time_life = 0
+start_time = time.time()
 
 JUMP_HEIGHT = 200
 
@@ -48,19 +51,19 @@ for i in range(10):
 hurt_torch = None
 torch_fine = 0
 
-
-def create_coins():
+coin_number = 20
+def create_coins(n):
     global i
-    for i in range(20) :
+    for i in range(n):
         coin = Coin(topleft=(random.randint(0 , WIDTH - 100) , random.randint(300 , 600)))
         coins.append(coin)
 
 
 coins = []
-create_coins()
+create_coins(coin_number)
 
 def draw():
-    global score, hurt_torch
+    global score, hurt_torch, time_life
     screen.clear()
     sky_color = (sky_color_red, sky_color_green, sky_color_blue)
     screen.fill(sky_color)
@@ -89,12 +92,15 @@ def draw():
     screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
     if score < 0:
         screen.draw.text("Всё ты проиграл:(", center=(WIDTH/2, HEIGHT/2), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
+        screen.draw.text(f"Время:{time_life} секунд(ы)", center=(WIDTH/2, HEIGHT/2 + 100), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
 
 
 def update():
-    global ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch, torch_fine
+    global ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch, torch_fine, coin_number, time_life, start_time
 
     if score < 0:
+        if time_life == 0:
+            time_life = round(time.time() - start_time)
         return
 
     # sky
@@ -162,7 +168,12 @@ def update():
             coins.remove(coin)
             score += 100
     if len(coins) == 0:
-        create_coins()
+        if coin_number >= 2:
+            coin_number -= 1
+        else:
+            coin_number = random.randint(1, 10)
+
+        create_coins(coin_number)
 
 
 
@@ -181,8 +192,16 @@ def on_mouse_down(pos):
 
 
 def on_key_up(key):
+    global score, start_time, time_life, torch_fine, player
     if key == keys.UP:
         player.jump(ground)
+
+    if key == keys.SPACE and score <= 0:
+        score = 0
+        start_time = time.time()
+        time_life = 0
+        torch_fine = 0
+        player.pos = 600, 450
 
 
 def set_player_hurt():
