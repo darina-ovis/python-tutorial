@@ -192,16 +192,17 @@ def on_mouse_down(pos):
 
 
 def on_key_up(key):
-    global score, start_time, time_life, torch_fine, player
+    global score, start_time, time_life, torch_fine, player, coin_number
     if key == keys.UP:
         player.jump(ground)
 
-    if key == keys.SPACE and score <= 0:
+    if (key == keys.RETURN or key == keys.SPACE) and score <= 0:
         score = 0
         start_time = time.time()
         time_life = 0
         torch_fine = 0
         player.pos = 600, 450
+        create_coins(coin_number)
 
 
 def set_player_hurt():
