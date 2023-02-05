@@ -1,7 +1,10 @@
 import random
-
 import pgzrun
 import pygame
+import time
+
+from game.coin import Coin
+from snowman import Snowman
 
 from pgzero.actor import Actor
 from pgzero.animation import animate, decelerate
@@ -9,15 +12,18 @@ from pgzero.clock import clock
 from pgzero.loaders import sounds, images
 from pgzero.rect import Rect
 
-JUMP_HIGHT = 120
+score = 0
+time_life = 0
+start_time = time.time()
+
+JUMP_HEIGHT = 200
 
 HEIGHT = 720  # ось Y
 WIDTH = 1280  # ось X
 PLAYER_IMAGE = 'snowman_right'
-player = Actor(PLAYER_IMAGE)
+player = Snowman(PLAYER_IMAGE)
 # circle._surf = pygame.transform.scale(circle._surf, (100, 100))
 player.pos = 600, 500
-is_moving_to_right = True
 sky_color_red = 0
 sky_color_green = 0
 sky_color_blue = 100
@@ -37,32 +43,65 @@ for i in range(40):
     )
 
 torches = []
-for i in range(4):
+for i in range(10):
     torches.append(
-        Actor('torch', bottomleft=(400 * i, HEIGHT - 100))
+        Actor('torch', bottomleft=(100+400 * i, HEIGHT - 100))
     )
 
+hurt_torch = None
+torch_fine = 0
+
+coin_number = 20
+def create_coins(n):
+    global i
+    for i in range(n):
+        coin = Coin(topleft=(random.randint(0 , WIDTH - 100) , random.randint(300 , 600)))
+        coins.append(coin)
+
+
+coins = []
+create_coins(coin_number)
 
 def draw():
+    global score, hurt_torch, time_life
     screen.clear()
     sky_color = (sky_color_red, sky_color_green, sky_color_blue)
     screen.fill(sky_color)
-    screen.blit('background_tr', (0, 0))
     screen.draw.rect(ground, DARK_RED_COLOUR)
 
     for star in stars:
         star.draw()
+
+    screen.blit('fon_s_elkami', (0, 0))
+
     for cloud in clouds:
         cloud.draw()
 
     for torch in torches:
         torch.draw()
 
+    if hurt_torch:
+        screen.draw.text(f"-{torch_fine}", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676", shadow=(1, 1), scolor="#e28743")
+
+
+    for coin in coins:
+        coin.draw()
+
     player.draw()
+
+    screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
+    if score < 0:
+        screen.draw.text("Всё ты проиграл:(", center=(WIDTH/2, HEIGHT/2), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
+        screen.draw.text(f"Время:{time_life} секунд(ы)", center=(WIDTH/2, HEIGHT/2 + 100), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
 
 
 def update():
-    global is_moving_to_right, ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light
+    global ground, sky_color_blue, sky_color_red, sky_color_green, from_dark_to_light, score, hurt_torch, torch_fine, coin_number, time_life, start_time
+
+    if score < 0:
+        if time_life == 0:
+            time_life = round(time.time() - start_time)
+        return
 
     # sky
     if from_dark_to_light:
@@ -91,30 +130,60 @@ def update():
 
     # player
     step = 3
-    if is_moving_to_right:
+    if player.is_moving_to_right:
         player.x += step
     else:
         player.x -= step
-    alien_half_width = player.width / 2
-    if player.x > WIDTH - alien_half_width or player.x < alien_half_width:
-        is_moving_to_right = not is_moving_to_right
+    player_half_width = player.width / 2
+    if player.x > WIDTH - player_half_width or player.x < player_half_width:
+        player.is_moving_to_right = not player.is_moving_to_right
         flip_image()
-    if not player.colliderect(ground):
-        player.y += step
+    max_height = HEIGHT - 100 - JUMP_HEIGHT
+    velocity = (player.y - max_height)/4
+
+    if not player.colliderect(ground) and not player.is_jumping:
+        player.y += velocity
+
+    if player.is_jumping:
+        if round(player.y) <= HEIGHT-100-JUMP_HEIGHT:
+            player.is_jumping = False
+            player.image = 'snowman_down' if player.is_moving_to_right else 'snowman_down_left'
+        else:
+            player.y -= velocity
     else:
-        flip_image()
+       flip_image()
 
     for torch in torches:
+        torch.x -= 1
+        if torch.x < 0:
+            torch.x += 4000
         if player.colliderect(torch):
             set_player_hurt()
+            score -= torch_fine
+            torch_fine += 1
+            hurt_torch = torch
+
+    for coin in coins:
+        if player.colliderect(coin):
+            coins.remove(coin)
+            score += 100
+    if len(coins) == 0:
+        if coin_number >= 2:
+            coin_number -= 1
+        else:
+            coin_number = random.randint(1, 10)
+
+        create_coins(coin_number)
+
 
 
 def flip_image():
-    if is_moving_to_right:
-        current_player_image = PLAYER_IMAGE
-    else:
-        current_player_image = "snowman_left"
-    player.image = current_player_image
+    if player.colliderect(ground):
+        if player.is_moving_to_right:
+            current_player_image = PLAYER_IMAGE
+        else:
+            current_player_image = "snowman_left"
+        player.image = current_player_image
 
 
 def on_mouse_down(pos):
@@ -123,29 +192,31 @@ def on_mouse_down(pos):
 
 
 def on_key_up(key):
+    global score, start_time, time_life, torch_fine, player, coin_number
     if key == keys.UP:
-        animate(player, 'decelerate', 2, jump())
+        player.jump(ground)
 
-
-def jump():
-    if player.colliderect(ground):
-        player.y -= JUMP_HIGHT
-        player.image = "snowman_up"
+    if (key == keys.RETURN or key == keys.SPACE) and score <= 0:
+        score = 0
+        start_time = time.time()
+        time_life = 0
+        torch_fine = 0
+        player.pos = 600, 450
+        create_coins(coin_number)
 
 
 def set_player_hurt():
     player.image = 'snowman_hurt'
     # circle.angle += 180
     # circle.y -= 20
-    sounds.eep.play()
     clock.schedule_unique(set_player_normal, 0.2)
 
 
 def set_player_normal():
-    global is_moving_to_right
+    global hurt_torch
+    hurt_torch = None
     flip_image()
     player.angle = 0
-    # circle._surf = pygame.transform.scale(circle._surf, (100, 100))
 
 
 pgzrun.go()
