@@ -11,6 +11,7 @@ class Player(VisibleActor):
         super().__init__(image, **kwargs)
         self.direction = pygame.Vector2()
         self.speed = 3
+        self.hitbox = self._rect.inflate(0, -10)
 
     def update_direction(self, key_pressed):
         if key_pressed == keys.UP:

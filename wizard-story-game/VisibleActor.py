@@ -10,12 +10,14 @@ class VisibleActor(pgzero.actor.Actor):
         self.half_height = 768 // 2  # self.display_surface.get_size()[1] // 2
         self.offset = pygame.math.Vector2()
 
-    def draw_with_offset(self, player):
+    def calculate_offset(self, player):
         self.offset.x = player.center[0] - self.half_width
         self.offset.y = player.center[1] - self.half_width
         offset_pos = self.topleft - self.offset
         self.topleft = offset_pos
-        self.draw()
+
+    def draw_with_offset(self, player):
+        self.calculate_offset(player)
 
 
 class Water(VisibleActor):
