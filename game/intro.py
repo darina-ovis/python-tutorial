@@ -1,21 +1,20 @@
 import random
-import pgzrun
-import pygame
 import time
 
-from game.coin import Coin
+import pgzrun
+
+from coin import Coin
 from snowman import Snowman
 
 from pgzero.actor import Actor
-from pgzero.animation import animate, decelerate
 from pgzero.clock import clock
-from pgzero.loaders import sounds, images
 from pgzero.rect import Rect
 
 score = 0
 time_life = 0
 start_time = time.time()
 
+ICON = "images/gold_vedro.png"
 JUMP_HEIGHT = 200
 
 HEIGHT = 720  # ось Y
@@ -45,22 +44,25 @@ for i in range(40):
 torches = []
 for i in range(10):
     torches.append(
-        Actor('torch', bottomleft=(100+400 * i, HEIGHT - 100))
+        Actor('torch', bottomleft=(100 + 400 * i, HEIGHT - 100))
     )
 
 hurt_torch = None
 torch_fine = 0
 
 coin_number = 20
+
+
 def create_coins(n):
     global i
     for i in range(n):
-        coin = Coin(topleft=(random.randint(0 , WIDTH - 100) , random.randint(300 , 600)))
+        coin = Coin(topleft=(random.randint(0, WIDTH - 100), random.randint(300, 600)))
         coins.append(coin)
 
 
 coins = []
 create_coins(coin_number)
+
 
 def draw():
     global score, hurt_torch, time_life
@@ -81,8 +83,8 @@ def draw():
         torch.draw()
 
     if hurt_torch:
-        screen.draw.text(f"-{torch_fine}", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676", shadow=(1, 1), scolor="#e28743")
-
+        screen.draw.text(f"-{torch_fine}", center=(hurt_torch.x, hurt_torch.y), fontsize=30, color="#eab676",
+                         shadow=(1, 1), scolor="#e28743")
 
     for coin in coins:
         coin.draw()
@@ -91,8 +93,10 @@ def draw():
 
     screen.draw.text(f"Счёт {score}", topleft=(50, 50), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
     if score < 0:
-        screen.draw.text("Всё ты проиграл:(", center=(WIDTH/2, HEIGHT/2), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
-        screen.draw.text(f"Время:{time_life} секунд(ы)", center=(WIDTH/2, HEIGHT/2 + 100), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
+        screen.draw.text("Всё ты проиграл:(", center=(WIDTH / 2, HEIGHT / 2), fontsize=70, color="#eab676",
+                         shadow=(1, 1), scolor="#e28743")
+        screen.draw.text(f"Время:{time_life} секунд(ы)", center=(WIDTH / 2, HEIGHT / 2 + 100), fontsize=70,
+                         color="#eab676", shadow=(1, 1), scolor="#e28743")
 
 
 def update():
@@ -139,19 +143,19 @@ def update():
         player.is_moving_to_right = not player.is_moving_to_right
         flip_image()
     max_height = HEIGHT - 100 - JUMP_HEIGHT
-    velocity = (player.y - max_height)/4
+    velocity = (player.y - max_height) / 4
 
     if not player.colliderect(ground) and not player.is_jumping:
         player.y += velocity
 
     if player.is_jumping:
-        if round(player.y) <= HEIGHT-100-JUMP_HEIGHT:
+        if round(player.y) <= HEIGHT - 100 - JUMP_HEIGHT:
             player.is_jumping = False
             player.image = 'snowman_down' if player.is_moving_to_right else 'snowman_down_left'
         else:
             player.y -= velocity
     else:
-       flip_image()
+        flip_image()
 
     for torch in torches:
         torch.x -= 1
@@ -174,7 +178,6 @@ def update():
             coin_number = random.randint(1, 10)
 
         create_coins(coin_number)
-
 
 
 def flip_image():
@@ -217,6 +220,5 @@ def set_player_normal():
     hurt_torch = None
     flip_image()
     player.angle = 0
-
 
 pgzrun.go()

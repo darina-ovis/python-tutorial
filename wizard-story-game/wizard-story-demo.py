@@ -1,11 +1,11 @@
 import pgzrun
-from pygame.math import Vector2
+import pygame.sprite
 
 from Player import Player
-from Stone import Stone
-from Tree import Tree
-from Water import Water
-from Bridge import Bridge
+from VisibleActor import Stone
+from VisibleActor import Tree
+from VisibleActor import Water
+from VisibleActor import Bridge
 
 HEIGHT = 768  # ось Y
 WIDTH = 1280  # ось X
@@ -14,11 +14,11 @@ TILE = 64
 # r - river
 # p - player
 LEVEL_MAP = [
-    ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+    [' ', ' ', 'r', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
     ['x', ' ', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
-    ['x', ' ', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'b', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', ' ', 'b', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
-    ['x', ' ', 'b', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', 'r', 'r', 'p', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', 'r', 't', 't', 't', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', 'r', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
@@ -30,7 +30,7 @@ LEVEL_MAP = [
 
 obstacles = []
 visible = []
-player: Player = None
+player: Player
 
 
 def init():
@@ -42,8 +42,7 @@ def init():
                 obstacles.append(stone)
                 visible.append(stone)
             elif col == 'p':
-                player = Player(topleft=(x_index * TILE, y_index * TILE))
-                visible.append(player)
+                player = Player('player', topleft=(x_index * TILE, y_index * TILE))
             elif col == 't':
                 tree = Tree(topleft=(x_index * TILE, y_index * TILE))
                 visible.append(tree)
@@ -55,50 +54,29 @@ def init():
             elif col == 'b':
                 bridge = Bridge(topleft=(x_index * TILE, y_index * TILE))
                 visible.append(bridge)
+    visible.append(player)
 
 
 init()
 
 
 def draw():
+    global player
     screen.clear()
     screen.fill('#228B22')
 
     for visible_object in visible:
-        visible_object.draw()
+        visible_object.draw_with_offset(player)
 
 
 def update():
     global player, obstacles
-    pos: Vector2
-    if player.direction.magnitude() != 0:
-        pos = player.direction.normalize() * player.speed
-    else:
-        pos = player.direction * player.speed
-
-    player.pos += pos
-    has_obstacle = False
-    current_obstacle = None
-    for obstacle in obstacles:
-        if player.colliderect(obstacle):
-            has_obstacle = True
-            current_obstacle = obstacle
-            break
-
-    if has_obstacle:
-        if player.direction.x == 1:
-            player.right = current_obstacle.left
-        elif player.direction.x == -1:
-            player.left = current_obstacle.right
-        if player.direction.y == 1:
-            player.bottom = current_obstacle.top
-        elif player.direction.y == -1:
-            player.top = current_obstacle.bottom
+    player.move(obstacles)
 
 
 def on_key_down(key):
     global player
-    player.move(key)
+    player.update_direction(key)
 
 
 def on_key_up(key):
