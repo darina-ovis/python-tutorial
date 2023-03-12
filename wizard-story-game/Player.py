@@ -21,8 +21,9 @@ class Player(Actor):
         elif key_pressed == keys.RIGHT:
             self.direction.x = 1
 
-    def move(self, obstacles):
+    def get_offset(self, obstacles) -> Vector2:
         pos: Vector2
+        start_pos = Vector2(self.x, self.y)
         if self.direction.magnitude() != 0:
             pos = self.direction.normalize() * self.speed
         else:
@@ -46,6 +47,11 @@ class Player(Actor):
                 elif self.direction.y < 0:
                     self.top = obstacle.bottom
                 break
+
+        result_pos = Vector2(self.x, self.y)
+        self.x = start_pos.x
+        self.y = start_pos.y
+        return Vector2(result_pos.x - start_pos.x, result_pos.y - start_pos.y)
 
     def stop(self, key_pressed):
         if key_pressed in [keys.UP,  keys.DOWN]:
