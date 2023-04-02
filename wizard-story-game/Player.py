@@ -11,7 +11,6 @@ class Player(VisibleActor):
         super().__init__(image, **kwargs)
         self.direction = pygame.Vector2()
         self.speed = 3
-        self.hitbox = self._rect.inflate(0, -10)
 
     def update_direction(self, key_pressed):
         if key_pressed == keys.UP:
@@ -49,16 +48,27 @@ class Player(VisibleActor):
 
     def update_horizontal_collision(self, obstacles):
         for obstacle in obstacles:
-            if self.colliderect(obstacle):
+            hitbox = obstacle.get_inflated()
+            if self.colliderect(hitbox):
                 if self.direction.y > 0:
-                    self.bottom = obstacle.top
+                    self.bottom = hitbox.top
                 elif self.direction.y < 0:
-                    self.top = obstacle.bottom
+                    self.top = hitbox.bottom
 
     def update_vertical_collision(self, obstacles):
         for obstacle in obstacles:
-            if self.colliderect(obstacle):
+            hitbox = obstacle.get_inflated()
+            if self.colliderect(hitbox):
                 if self.direction.x > 0:
-                    self.right = obstacle.left
+                    self.right = hitbox.left
                 elif self.direction.x < 0:
-                    self.left = obstacle.right
+                    self.left = hitbox.right
+
+   # def colliderect(self, *other):
+   #      rect = self.__class__(*other)
+   #      return (
+   #          self.x < rect.x + rect.w and
+   #          self.y < rect.y + rect.h and
+   #          self.x + self.w > rect.x and
+   #          self.y + self.h > rect.y
+   #      )

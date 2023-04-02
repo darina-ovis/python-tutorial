@@ -84,7 +84,6 @@ def draw():
 
     for visible_object in sorted(visible, key=lambda sprite: sprite.y):
         visible_object.draw()
-    # player.draw_with_offset(player)
 
 
 def update():

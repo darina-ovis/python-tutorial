@@ -19,6 +19,9 @@ class VisibleActor(pgzero.actor.Actor):
     def draw_with_offset(self, player):
         self.calculate_offset(player)
 
+    def get_inflated(self):
+        return self.inflate(0, -30)
+
 
 class Water(VisibleActor):
     def __init__(self, **kwargs):
