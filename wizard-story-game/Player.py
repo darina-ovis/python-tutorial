@@ -30,9 +30,10 @@ class Player(Actor):
             pos = self.direction * self.speed
 
         self.x += pos.x
+        hitbox = self.inflate(0, -20)
 
         for obstacle in obstacles:
-            if self.colliderect(obstacle):
+            if hitbox.colliderect(obstacle):
                 if self.direction.x > 0:
                     self.right = obstacle.left
                 elif self.direction.x < 0:
@@ -41,11 +42,11 @@ class Player(Actor):
 
         self.y += pos.y
         for obstacle in obstacles:
-            if self.colliderect(obstacle):
+            if hitbox.colliderect(obstacle):
                 if self.direction.y > 0:
-                    self.bottom = obstacle.top
+                    self.bottom = - obstacle.top + hitbox.bottom + 20
                 elif self.direction.y < 0:
-                    self.top = obstacle.bottom
+                    self.top = obstacle.bottom - hitbox.top + 20
                 break
 
         result_pos = Vector2(self.x, self.y)
