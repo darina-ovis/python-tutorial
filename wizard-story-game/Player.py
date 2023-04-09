@@ -30,23 +30,24 @@ class Player(Actor):
             pos = self.direction * self.speed
 
         self.x += pos.x
-        hitbox = self.inflate(0, -20)
 
         for obstacle in obstacles:
-            if hitbox.colliderect(obstacle):
+            hitbox = obstacle.inflate(-5, -20)
+            if self.colliderect(hitbox):
                 if self.direction.x > 0:
-                    self.right = obstacle.left
+                    self.right = hitbox.left
                 elif self.direction.x < 0:
-                    self.left = obstacle.right
+                    self.left = hitbox.right
                 break
 
         self.y += pos.y
         for obstacle in obstacles:
-            if hitbox.colliderect(obstacle):
+            hitbox = obstacle.inflate(-5, -20)
+            if self.colliderect(hitbox):
                 if self.direction.y > 0:
-                    self.bottom = - obstacle.top + hitbox.bottom + 20
+                    self.bottom = hitbox.top
                 elif self.direction.y < 0:
-                    self.top = obstacle.bottom - hitbox.top + 20
+                    self.top = hitbox.bottom
                 break
 
         result_pos = Vector2(self.x, self.y)

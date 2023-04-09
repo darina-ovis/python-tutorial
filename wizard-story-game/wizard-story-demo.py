@@ -1,7 +1,7 @@
 import pgzrun
 
-from Base import Bridge
-from Base import Stone
+from Base import Bridge, Stone, Field
+from Base import Mountain
 from Base import Tree
 from Base import Water
 from Player import Player
@@ -9,12 +9,12 @@ from Player import Player
 HEIGHT = 768  # ось Y
 WIDTH = 1280  # ось X
 TILE = 64
-# x - tree
+# x - mountain
 # r - river
 # b - bridge
 # t - tree
-# f - ???
-# s - ???
+# f - field
+# s - stone
 # p - player
 LEVEL_MAP = [
     ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'r', 'r', 'r', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
@@ -115,9 +115,9 @@ def init():
     for y_index, row in enumerate(LEVEL_MAP):
         for x_index, col in enumerate(row):
             if col == 'x':
-                stone = Stone(topleft=(x_index * TILE, y_index * TILE))
-                obstacles.append(stone)
-                visible.append(stone)
+                mountain = Mountain(topleft=(x_index * TILE, y_index * TILE))
+                obstacles.append(mountain)
+                visible.append(mountain)
             elif col == 'p':
                 player = Player(topleft=(x_index * TILE, y_index * TILE))
                 visible.append(player)
@@ -132,6 +132,12 @@ def init():
             elif col == 'b':
                 bridge = Bridge(topleft=(x_index * TILE, y_index * TILE))
                 visible.append(bridge)
+            elif col == 's':
+                stone = Stone(topleft=(x_index * TILE, y_index * TILE))
+                visible.append(stone)
+            elif col == 'f':
+                field = Field(topleft=(x_index * TILE, y_index * TILE))
+                visible.append(field)
     if player is None:
         player = Player(topleft=(WIDTH // 2, HEIGHT // 2))
         visible.append(player)
@@ -146,10 +152,10 @@ init()
 def draw():
     screen.clear()
     screen.fill('#228B22')
-
+    sorted = sorted(visible, key=lambda actor:actor.y)
+    sorted = sorted(sorted, key=lambda actor: obstacles.__contains__() )
     for visible_object in visible:
         visible_object.draw()
-
 
 def update():
     global player, obstacles

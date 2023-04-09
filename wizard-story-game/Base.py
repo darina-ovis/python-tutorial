@@ -11,9 +11,9 @@ class Bridge(Base):
         super().__init__('bridge', **kwargs)
 
 
-class Stone(Base):
+class Mountain(Base):
     def __init__(self, **kwargs):
-        super().__init__('stone', **kwargs)
+        super().__init__('mountain', **kwargs)
 
 
 class Tree(Base):
@@ -24,3 +24,11 @@ class Tree(Base):
 class Water(Base):
     def __init__(self, **kwargs):
         super().__init__('water', **kwargs)
+
+class Stone(Base):
+    def __init__(self, **kwargs):
+        super().__init__('stone', **kwargs)
+
+class Field(Base):
+    def __init__(self, **kwargs):
+        super().__init__('field', **kwargs)
