@@ -1,11 +1,10 @@
 import pgzrun
-from pygame.math import Vector2
 
 from Player import Player
-from Stone import Stone
-from Tree import Tree
-from Water import Water
-from Bridge import Bridge
+from VisibleActor import Stone
+from VisibleActor import Tree
+from VisibleActor import Water
+from VisibleActor import Bridge
 
 HEIGHT = 768  # ось Y
 WIDTH = 1280  # ось X
@@ -14,11 +13,23 @@ TILE = 64
 # r - river
 # p - player
 LEVEL_MAP = [
-    ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-    ['x', ' ', 'r', ' ', ' ', 't', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
-    ['x', ' ', 'r', 't', ' ', 't', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
-    ['x', ' ', 'b', ' ', ' ', 't', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
-    ['x', 'r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    [' ', ' ', 'r', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+    ['x', ' ', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'b', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'b', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', 'r', 'r', 'p', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', 'r', 't', 't', 't', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', 'r', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', 'r', ' ', ' ', ' ', ' ', 't', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['r', 'r', ' ', ' ', ' ', ' ', 't', 't', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['r', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+    [' ', ' ', 'r', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+    ['x', ' ', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'b', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'b', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', 'r', 'r', 'p', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', 'r', 't', 't', 't', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', 'r', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
@@ -30,7 +41,7 @@ LEVEL_MAP = [
 
 obstacles = []
 visible = []
-player: Player = None
+player: Player
 
 
 def init():
@@ -42,8 +53,7 @@ def init():
                 obstacles.append(stone)
                 visible.append(stone)
             elif col == 'p':
-                player = Player(topleft=(x_index * TILE, y_index * TILE))
-                visible.append(player)
+                player = Player('player', topleft=(x_index * TILE, y_index * TILE))
             elif col == 't':
                 tree = Tree(topleft=(x_index * TILE, y_index * TILE))
                 visible.append(tree)
@@ -55,16 +65,24 @@ def init():
             elif col == 'b':
                 bridge = Bridge(topleft=(x_index * TILE, y_index * TILE))
                 visible.append(bridge)
+    visible.append(player)
 
 
 init()
 
 
 def draw():
+    global player
     screen.clear()
     screen.fill('#228B22')
 
+    visible.remove(player)
     for visible_object in visible:
+        visible_object.draw_with_offset(player)
+    player.draw_with_offset(player)
+    visible.append(player)
+
+    for visible_object in sorted(visible, key=lambda sprite: sprite.y):
         visible_object.draw()
 
 
