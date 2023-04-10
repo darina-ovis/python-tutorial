@@ -152,10 +152,10 @@ init()
 def draw():
     screen.clear()
     screen.fill('#228B22')
-    sorted = sorted(visible, key=lambda actor:actor.y)
-    sorted = sorted(sorted, key=lambda actor: obstacles.__contains__() )
-    for visible_object in visible:
+    for visible_object in sorted(visible,
+                                 key=lambda actor: actor.y if actor in obstacles or isinstance(actor, Player) else 0):
         visible_object.draw()
+
 
 def update():
     global player, obstacles
