@@ -5,6 +5,7 @@ from Base import Mountain
 from Base import Tree
 from Base import Water
 from Player import Player
+from Music import Music
 
 HEIGHT = 768  # ось Y
 WIDTH = 1280  # ось X
@@ -95,7 +96,7 @@ LEVEL_MAP = [
      ' ', ' ', 't', 't', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', 't', 't', 'r', 'b', 't', 't', 't', 't', 't', 't', 't', 't', 't',
      ' ', '  ', 't', 't', 't', 't', 't', ' ', ' ', ' ', 's', ' ', 't', ' ', ' ', ' ', 'x'],
-    ['x', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', 't', 't', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r',
+    ['x', 'p', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', 't', 't', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r',
      'r', 't', 't', 't', 't', 't', 't', ' ', 's', ' ', ' ', 't', ' ', 't', ' ', ' ', 'x'],
     ['x', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', 's', 't', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r',
      'r', 't', 't', 't', 't', 't', ' ', ' ', ' ', 't', ' ', ' ', 's', ' ', ' ', ' ', 'x'],
@@ -108,6 +109,7 @@ LEVEL_MAP = [
 obstacles = []
 visible = []
 player: Player = None
+music = Music(clock)
 
 
 def init():
@@ -171,6 +173,9 @@ def update():
 def on_key_down(key):
     global player
     player.update_direction(key)
+    if key == keys.RETURN:
+        music.play()
+
 
 
 def on_key_up(key):
