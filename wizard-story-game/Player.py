@@ -9,6 +9,7 @@ class Player(Actor):
         super().__init__('player', **kwargs)
         self.direction = pygame.Vector2()
         self.speed = 3
+        self.current_music = None
 
     def update_direction(self, key_pressed):
         if key_pressed == keys.UP:
@@ -56,7 +57,10 @@ class Player(Actor):
         return Vector2(result_pos.x - start_pos.x, result_pos.y - start_pos.y)
 
     def stop(self, key_pressed):
-        if key_pressed in [keys.UP,  keys.DOWN]:
+        if key_pressed in [keys.UP, keys.DOWN]:
             self.direction.y = 0
-        if key_pressed in [keys.LEFT,  keys.RIGHT]:
+        if key_pressed in [keys.LEFT, keys.RIGHT]:
             self.direction.x = 0
+
+    def is_moving(self) -> bool:
+        return self.direction.magnitude() != 0
