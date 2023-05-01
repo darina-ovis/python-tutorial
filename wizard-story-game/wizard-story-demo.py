@@ -1,4 +1,5 @@
 import pgzrun
+from pgzero import music
 
 from Base import Bridge, Stone, Field, Base
 from Base import Mountain
@@ -51,7 +52,6 @@ LEVEL_MAP = [
 obstacles = []
 visible = []
 player: Player = None
-music = Music(clock)
 
 
 def init():
@@ -106,12 +106,29 @@ def init():
 init()
 
 
+def is_tile_changed(current_tile) -> bool:
+    return player.last_tile != current_tile
+
+
+def change_music(current_tile):
+    if isinstance(current_tile, Bridge):
+        print('player on bridge')
+    elif isinstance(current_tile, Field):
+        print('player in mud')
+    else:
+        print('player on grass')
+
+
 def draw():
     screen.clear()
     screen.fill('#228B22')
     for visible_object in sorted(visible,
                                  key=lambda actor: actor.y if actor in obstacles or isinstance(actor, Player) else 0):
         visible_object.draw()
+    current_tile = player.get_current_tile(visible)
+    if is_tile_changed(current_tile):
+        change_music(current_tile)
+        player.last_tile = current_tile
 
 
 def update():
@@ -128,13 +145,15 @@ def update():
 def on_key_down(key):
     global player
     player.update_direction(key)
-    if key == keys.RETURN:
-        music.play(clock)
+    if not music.is_playing(''):
+        music.play('step.wav')
 
 
 def on_key_up(key):
     global player
     player.stop(key)
+    if player.is_stopped():
+        music.fadeout(0.4)
 
 
 pgzrun.go()
