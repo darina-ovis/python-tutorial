@@ -8,7 +8,7 @@ from Base import Mountain
 from Base import Tree
 from Base import Water
 from Player import Player
-from Music import Music
+from music import Music
 
 HEIGHT = 768  # ось Y
 WIDTH = 1280  # ось X
