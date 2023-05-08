@@ -68,5 +68,6 @@ class Player(Actor):
 
     def get_current_tile(self, visible) -> Base:
         for tile in visible:
-            if self.colliderect(tile):
+            hitbox = tile.inflate(-5, -20)
+            if self.colliderect(hitbox):
                 return tile

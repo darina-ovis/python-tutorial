@@ -24,8 +24,8 @@ LEVEL_MAP = [
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f',
      'f', 'f', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', 's', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f', 'f', 'f', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', 'x'],
-    ['x', ' ', ' ', ' ', ' ', 't', ' ', ' ', 't', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f', 'f', 'f', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', 't', ' ', 'x'],
-    ['x', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f', 'f', 'f', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 't', ' ', 's', ' ', ' ', 'x'],
+    ['x', ' ', ' ', ' ', ' ', 't', ' ', ' ', 't', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f', 'f', 'f', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', 't', ' ', 'x'],
+    ['x', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f', 'f', 'f', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 't', ' ', 's', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', 's', ' ', ' ', ' ', 'f', 'f', 'f', 'f', 'f', 't', ' ', 't', 't', 't', 't', 't', 't', 'x', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', 't', 't', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', 'x'],
@@ -107,16 +107,21 @@ init()
 
 
 def is_tile_changed(current_tile) -> bool:
-    return player.last_tile != current_tile
+    return player.last_tile != current_tile and \
+           (isinstance(player.last_tile, Bridge) or isinstance(player.last_tile, Field)
+            or isinstance(current_tile, Bridge) or isinstance(current_tile, Bridge))
 
 
 def change_music(current_tile):
     if isinstance(current_tile, Bridge):
         print('player on bridge')
+        music.play('footsteps-on-bridge.wav')
     elif isinstance(current_tile, Field):
         print('player in mud')
+        music.play('footsteps-on-ground.wav')
     else:
         print('player on grass')
+        music.play('footsteps-on-grass.wav')
 
 
 def draw():
@@ -126,7 +131,7 @@ def draw():
                                  key=lambda actor: actor.y if actor in obstacles or isinstance(actor, Player) else 0):
         visible_object.draw()
     current_tile = player.get_current_tile(visible)
-    if is_tile_changed(current_tile):
+    if not player.is_stopped() and is_tile_changed(current_tile):
         change_music(current_tile)
         player.last_tile = current_tile
 
@@ -146,14 +151,14 @@ def on_key_down(key):
     global player
     player.update_direction(key)
     if not music.is_playing(''):
-        music.play('step.wav')
+        change_music(player.last_tile)
 
 
 def on_key_up(key):
     global player
     player.stop(key)
     if player.is_stopped():
-        music.fadeout(0.4)
+        music.stop()
 
 
 pgzrun.go()
