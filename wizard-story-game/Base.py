@@ -37,12 +37,18 @@ class Field(Base):
 
 
 class Monster(Actor):
-    def __init__(self, image, **kwargs):
-        super().__init__(image, **kwargs)
-        self.counter = 0
+    def __init__(self, images, **kwargs):
+        super().__init__(images[0], **kwargs)
+        self.direction = 1
+        self.images = images
+        self.current_image = 0
 
-    def move(self):
-        self.x += 1 if self.counter < 50 else -1
-        self.counter += 1
-        if self.counter > 100:
-            self.counter = 0
+    def move(self, obstacles):
+        self.x += self.direction
+        for obstacle in obstacles:
+            if obstacle.colliderect(self):
+                self.direction *= -1
+                self.x += self.direction
+                self.current_image = (self.current_image + 1) % len(self.images)
+                self.image = self.images[self.current_image]
+

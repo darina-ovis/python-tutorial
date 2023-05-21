@@ -8,6 +8,7 @@ import Base
 class Player(Actor):
     def __init__(self, **kwargs):
         super().__init__('player', **kwargs)
+        self.shooting = False
         self.direction = pygame.Vector2()
         self.speed = 3
         self.last_tile = None
@@ -71,3 +72,10 @@ class Player(Actor):
             hitbox = tile.inflate(-5, -20)
             if self.colliderect(hitbox):
                 return tile
+
+    def shoot(self, is_shooting):
+        self.shooting = is_shooting
+        if is_shooting:
+            print("KYA")
+        else:
+            print("YAK")

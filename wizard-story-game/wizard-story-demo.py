@@ -22,7 +22,7 @@ LEVEL_MAP = [
     ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'r', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
      'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f',
-     'f', 'f', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', 's', ' ', 'x'],
+     'f', 'f', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'fr', 'f', 'f', 'f', 'fl', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', 't', ' ', ' ', 't', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'fr', 'f', 'f', 'f', 'fl', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', 't', ' ', 'x'],
     ['x', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', 'm', ' ', 't', ' ', 'fr', 'f', 'f', 'f', 'fl', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 't', ' ', 's', ' ', ' ', 'x'],
@@ -30,7 +30,7 @@ LEVEL_MAP = [
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', 't', 't', 't', 't', 't', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'bu', 'bu', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 's', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 'x'],
-    ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', 'b', 'b', 'p', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', 'x'],
+    ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', 'w', 'b', 'b', 'p', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', 'bd', 'bd', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 's', 't', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 's', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
@@ -52,12 +52,12 @@ LEVEL_MAP = [
 obstacles = []
 visible = []
 player: Player = None
-monster: Monster
+monsters = []
 
 
 def init():
     music.play('background.mid')
-    global player, monster
+    global player, snake
     for y_index, row in enumerate(LEVEL_MAP):
         for x_index, col in enumerate(row):
             if col == 'x':
@@ -99,8 +99,13 @@ def init():
                 field_border = Base('grass-field-left', topleft=(x_index * TILE, y_index * TILE))
                 visible.append(field_border)
             elif col == 'm':
-                monster = Monster('snake', topleft=(x_index * TILE, y_index * TILE))
-                visible.append(monster)
+                snake = Monster(['snake'], topleft=(x_index * TILE, y_index * TILE))
+                monsters.append(snake)
+                visible.append(snake)
+            elif col == 'w':
+                wolf = Monster(['wolf-right', 'wolf-left'], topleft=(x_index * TILE, y_index * TILE))
+                visible.append(wolf)
+                monsters.append(wolf)
     if player is None:
         player = Player(topleft=(WIDTH // 2, HEIGHT // 2))
         visible.append(player)
@@ -148,8 +153,9 @@ def draw():
 
 
 def update():
-    global player, monster, obstacles
-    monster.move()
+    global player, monsters, obstacles
+    for monster in monsters:
+        monster.move(obstacles)
     pos = player.get_offset(obstacles)
     visible.remove(player)
     for tile in visible:
@@ -162,13 +168,17 @@ def update():
 def on_key_down(key):
     global player
     player.update_direction(key)
-    if not music.is_playing(''):
-        change_music(player.last_tile)
+    if key == keys.SPACE:
+        player.shoot(True)
+    # if not music.is_playing(''):
+    #     change_music(player.last_tile)
 
 
 def on_key_up(key):
     global player
     player.stop(key)
+    if key == keys.SPACE:
+        player.shoot(False)
     if player.is_stopped():
         music.stop()
 
