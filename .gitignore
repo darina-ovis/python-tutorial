@@ -1,2 +1,5 @@
 .idea
 *.iml
+
+.idea/*.iml
+.idea/*.xml
