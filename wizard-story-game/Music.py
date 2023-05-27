@@ -14,7 +14,7 @@ class Music:
         # self.channel = self.tones[0].play()
         self.clock = clock
 
-    def play(self, clock: time.Clock):
+    def play(self):
         channel = self.tones[0].play()
         channel.queue(self.tones[1])
         channel.get_queue(self.tones[2])

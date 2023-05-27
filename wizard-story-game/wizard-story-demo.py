@@ -1,4 +1,5 @@
 import pgzrun
+import pygame
 from pgzero import music
 
 from Base import Bridge, Stone, Field, Base, Monster
@@ -21,8 +22,8 @@ TILE = 64
 LEVEL_MAP = [
     ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'r', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
      'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-    ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'f', 'f', 'f',
-     'f', 'f', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', 'x'],
+    ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'fr', 'f', 'f',
+     'f', 'fl', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'fr', 'f', 'f', 'f', 'fl', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', 'x'],
     ['x', ' ', ' ', ' ', ' ', 't', ' ', ' ', 't', ' ', ' ', ' ', 'r', 'r', ' ', ' ', ' ', ' ', 't', ' ', 'fr', 'f', 'f', 'f', 'fl', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', 't', ' ', 'x'],
     ['x', ' ', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'r', ' ', ' ', 'm', ' ', 't', ' ', 'fr', 'f', 'f', 'f', 'fl', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 't', ' ', 's', ' ', ' ', 'x'],
@@ -56,8 +57,9 @@ monsters = []
 
 
 def init():
-    music.play('background.mid')
-    global player, snake
+    global player
+
+    play_background_music()
     for y_index, row in enumerate(LEVEL_MAP):
         for x_index, col in enumerate(row):
             if col == 'x':
@@ -112,11 +114,16 @@ def init():
     else:
         a = WIDTH // 2 - player.x
         b = HEIGHT // 2 - player.y
-        # player.x = WIDTH // 2
-        # player.y = HEIGHT // 2
+
         for tile in visible:
             tile.x += a
             tile.y += b
+
+
+def play_background_music():
+    pygame.mixer.init()
+    background_sound = pygame.mixer.Sound('music/background.wav')
+    pygame.mixer.Channel(1).play(background_sound, -1)
 
 
 init()
@@ -144,12 +151,16 @@ def draw():
     screen.clear()
     screen.fill('#228B22')
     for visible_object in sorted(visible,
-                                 key=lambda actor: actor.y if actor in obstacles or isinstance(actor, Player) else 0):
+                                 key=sorted_by_y_and_type()):
         visible_object.draw()
     current_tile = player.get_current_tile(visible)
     if not player.is_stopped() and is_tile_changed(current_tile):
         change_music(current_tile)
         player.last_tile = current_tile
+
+
+def sorted_by_y_and_type():
+    return lambda actor: actor.y if actor in obstacles or isinstance(actor, Player) or isinstance(actor, Monster) else 0
 
 
 def update():
@@ -167,11 +178,13 @@ def update():
 
 def on_key_down(key):
     global player
-    player.update_direction(key)
     if key == keys.SPACE:
         player.shoot(True)
-    # if not music.is_playing(''):
-    #     change_music(player.last_tile)
+        return
+
+    player.update_direction(key)
+    if not music.is_playing(''):
+        change_music(player.last_tile)
 
 
 def on_key_up(key):
