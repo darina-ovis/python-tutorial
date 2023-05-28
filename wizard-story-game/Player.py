@@ -1,5 +1,6 @@
 import pygame
 from pgzero.actor import Actor
+from pgzero.clock import clock
 from pgzero.keyboard import keys
 from pygame.math import Vector2
 import Base
@@ -12,6 +13,7 @@ class Player(Actor):
         self.direction = pygame.Vector2()
         self.speed = 3
         self.last_tile = None
+        self.attack = None
 
     def update_direction(self, key_pressed):
         if key_pressed == keys.UP:
@@ -76,6 +78,8 @@ class Player(Actor):
     def shoot(self, is_shooting):
         self.shooting = is_shooting
         if is_shooting:
-            print("KYA")
-        else:
-            print("YAK")
+            self.attack.show()
+            self.attack.direction = pygame.Vector2(self.direction) if self.direction.magnitude() > 0 else pygame.Vector2(0, 1)
+
+
+

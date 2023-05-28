@@ -1,3 +1,4 @@
+import pygame
 from pgzero.actor import Actor
 
 
@@ -52,3 +53,15 @@ class Monster(Actor):
                 self.current_image = (self.current_image + 1) % len(self.images)
                 self.image = self.images[self.current_image]
 
+
+class Attack(Actor):
+    def __init__(self, **kwargs):
+        super().__init__('fireball', **kwargs)
+        self.is_hidden = True
+        self.direction = pygame.Vector2()
+
+    def hide(self):
+        self.is_hidden = True
+
+    def show(self):
+        self.is_hidden = False

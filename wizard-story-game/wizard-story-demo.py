@@ -2,7 +2,7 @@ import pgzrun
 import pygame
 from pgzero import music
 
-from Base import Bridge, Stone, Field, Base, Monster
+from Base import Bridge, Stone, Field, Base, Monster, Attack
 from Base import Mountain
 from Base import Tree
 from Base import Water
@@ -118,6 +118,7 @@ def init():
         for tile in visible:
             tile.x += a
             tile.y += b
+    player.attack = Attack(topleft=player.topleft)
 
 
 def play_background_music():
@@ -157,10 +158,15 @@ def draw():
     if not player.is_stopped() and is_tile_changed(current_tile):
         change_music(current_tile)
         player.last_tile = current_tile
+    if player.shooting:
+        player.attack.show()
+        player.attack.draw()
 
 
 def sorted_by_y_and_type():
-    return lambda actor: actor.y if actor in obstacles or isinstance(actor, Player) or isinstance(actor, Monster) else 0
+    return lambda actor: actor.y if actor in obstacles \
+                                    or isinstance(actor, Player) \
+                                    or isinstance(actor, Monster) else 0
 
 
 def update():
@@ -175,6 +181,10 @@ def update():
 
     visible.append(player)
 
+    if player.shooting:
+        player.attack.x += player.attack.direction.x * 2 - pos.x
+        player.attack.y += player.attack.direction.y * 2 - pos.y
+
 
 def on_key_down(key):
     global player
@@ -187,11 +197,19 @@ def on_key_down(key):
         change_music(player.last_tile)
 
 
+def stop_shooting():
+    global player
+    player.shoot(False)
+    player.attack.hide()
+    player.attack.direction = pygame.Vector2(0, 0)
+    player.attack.topleft = player.topleft
+
+
 def on_key_up(key):
     global player
     player.stop(key)
     if key == keys.SPACE:
-        player.shoot(False)
+        clock.schedule(stop_shooting, 3.0)
     if player.is_stopped():
         music.stop()
 
