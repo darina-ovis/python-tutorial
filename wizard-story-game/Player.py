@@ -79,7 +79,24 @@ class Player(Actor):
         self.shooting = is_shooting
         if is_shooting:
             self.attack.show()
-            self.attack.direction = pygame.Vector2(self.direction) if self.direction.magnitude() > 0 else pygame.Vector2(0, 1)
+            if self.direction.magnitude() > 0:
+                self.attack.direction = pygame.Vector2(self.direction)
+            else:
+                if self.image == 'player':
+                    self.attack.direction = pygame.Vector2(0, 1)
+                elif self.image == 'player-back':
+                    self.attack.direction = pygame.Vector2(0, -1)
+                elif self.image == 'player-right':
+                    self.attack.direction = pygame.Vector2(1, 0)
+                else:
+                    self.attack.direction = pygame.Vector2(-1, 0)
 
-
-
+    def change_image(self):
+        if self.direction == (0, -1):
+            self.image = 'player-back'
+        elif self.direction.x > 0:
+            self.image = 'player-right'
+        elif self.direction.x < 0:
+            self.image = 'player-left'
+        elif self.direction == (0, 1):
+            self.image = 'player'

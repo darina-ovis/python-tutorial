@@ -138,19 +138,18 @@ def is_tile_changed(current_tile) -> bool:
 
 def change_music(current_tile):
     if isinstance(current_tile, Bridge):
-        print('player on bridge')
         music.play('footsteps-on-bridge.wav')
     elif isinstance(current_tile, Field):
-        print('player in mud')
         music.play('footsteps-on-ground.wav')
     else:
-        print('player on grass')
         music.play('footsteps-on-grass.wav')
 
 
 def draw():
     screen.clear()
     screen.fill('#228B22')
+    player.change_image()
+
     for visible_object in sorted(visible,
                                  key=sorted_by_y_and_type()):
         visible_object.draw()
@@ -189,7 +188,11 @@ def update():
 def on_key_down(key):
     global player
     if key == keys.SPACE:
+        if player.shooting:
+            return
         player.shoot(True)
+        music.play_once('firewall.wav')
+        clock.schedule(stop_shooting, 3.0)
         return
 
     player.update_direction(key)
@@ -209,7 +212,8 @@ def on_key_up(key):
     global player
     player.stop(key)
     if key == keys.SPACE:
-        clock.schedule(stop_shooting, 3.0)
+        return
+        # clock.schedule(stop_shooting, 3.0)
     if player.is_stopped():
         music.stop()
 
