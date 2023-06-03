@@ -152,6 +152,10 @@ def draw():
 
     for visible_object in sorted(visible,
                                  key=sorted_by_y_and_type()):
+        if isinstance(visible_object, Monster) and visible_object.is_hurt:
+            visible_object.twincle()
+            if visible_object.is_twincle:
+                continue
         visible_object.draw()
     current_tile = player.get_current_tile(visible)
     if not player.is_stopped() and is_tile_changed(current_tile):
@@ -183,6 +187,19 @@ def update():
     if player.shooting:
         player.attack.x += player.attack.direction.x * 2 - pos.x
         player.attack.y += player.attack.direction.y * 2 - pos.y
+
+        dead_monsters = []
+        for monster in monsters:
+            if player.attack.colliderect(monster):
+                monster.hurt()
+                player.shooting = False
+                if monster.life == 0:
+                    visible.remove(monster)
+                    dead_monsters.append(monster)
+                else:
+                    clock.schedule(monster.stop_hurting, 3.0)
+        for monster in dead_monsters:
+            monsters.remove(monster)
 
 
 def on_key_down(key):

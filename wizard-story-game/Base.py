@@ -43,6 +43,9 @@ class Monster(Actor):
         self.direction = 1
         self.images = images
         self.current_image = 0
+        self.is_hurt = False
+        self.is_twincle = False
+        self.life = 2
 
     def move(self, obstacles):
         self.x += self.direction
@@ -53,6 +56,18 @@ class Monster(Actor):
                 self.current_image = (self.current_image + 1) % len(self.images)
                 self.image = self.images[self.current_image]
 
+    def hurt(self):
+        if self.is_hurt:
+            return
+        self.is_hurt = True
+        self.life -= 1
+        print("I'm hurt")
+
+    def stop_hurting(self):
+        self.is_hurt = False
+
+    def twincle(self):
+        self.is_twincle = not self.is_twincle
 
 class Attack(Actor):
     def __init__(self, **kwargs):
