@@ -123,7 +123,7 @@ def init():
 
 def play_background_music():
     pygame.mixer.init()
-    background_sound = pygame.mixer.Sound('music/background.wav')
+    background_sound = pygame.mixer.Sound('music/musbackground.wav')
     pygame.mixer.Channel(1).play(background_sound, -1)
 
 
