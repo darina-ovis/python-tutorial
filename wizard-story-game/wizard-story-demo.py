@@ -176,6 +176,8 @@ def update():
     global player, monsters, obstacles
     for monster in monsters:
         monster.move(obstacles)
+        if player.colliderect(monster):
+            player.hurt()
     pos = player.get_offset(obstacles)
     visible.remove(player)
     for tile in visible:

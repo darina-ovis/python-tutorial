@@ -14,6 +14,7 @@ class Player(Actor):
         self.speed = 3
         self.last_tile = None
         self.attack = None
+        self.hearts = 3
 
     def update_direction(self, key_pressed):
         if key_pressed == keys.UP:
@@ -100,3 +101,7 @@ class Player(Actor):
             self.image = 'player-left'
         elif self.direction == (0, 1):
             self.image = 'player'
+
+    def hurt(self):
+        self.hearts = self.hearts - 1
+        print(self.hearts)
