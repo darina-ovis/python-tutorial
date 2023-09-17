@@ -1,3 +1,5 @@
+import time
+
 import pygame
 from pgzero.actor import Actor
 from pgzero.clock import clock
@@ -15,6 +17,7 @@ class Player(Actor):
         self.last_tile = None
         self.attack = None
         self.hearts = 3
+        self.start = -1
 
     def update_direction(self, key_pressed):
         if key_pressed == keys.UP:
@@ -103,5 +106,12 @@ class Player(Actor):
             self.image = 'player'
 
     def hurt(self):
-        self.hearts = self.hearts - 1
-        print(self.hearts)
+        if self.start == -1:
+            self.start = time.time()
+            self.hearts = self.hearts - 1
+            print(self.hearts)
+        end = time.time()
+        if end - self.start > 3:
+            self.hearts = self.hearts - 1
+            print(self.hearts)
+            self.start = time.time()

@@ -80,3 +80,8 @@ class Attack(Actor):
 
     def show(self):
         self.is_hidden = False
+
+class Heart(Actor):
+    def __init__(self, **kwargs):
+        super().__init__('red-heart', **kwargs)
+
