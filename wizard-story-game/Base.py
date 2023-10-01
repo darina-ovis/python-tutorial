@@ -82,6 +82,7 @@ class Attack(Actor):
         self.is_hidden = False
 
 class Heart(Actor):
-    def __init__(self, **kwargs):
-        super().__init__('red-heart', **kwargs)
+
+    def __init__(self, image, **kwargs):
+        super().__init__(image, **kwargs)
 

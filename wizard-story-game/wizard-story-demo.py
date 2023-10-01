@@ -2,7 +2,7 @@ import pgzrun
 import pygame
 from pgzero import music
 
-from Base import Bridge, Stone, Field, Base, Monster, Attack
+from Base import Bridge, Stone, Field, Base, Monster, Attack, Heart
 from Base import Mountain
 from Base import Tree
 from Base import Water
@@ -164,6 +164,14 @@ def draw():
     if player.shooting:
         player.attack.show()
         player.attack.draw()
+    for i in range(0, player.hearts):
+        heart = Heart('red-heart',topleft = (10 + i * 64, 10))
+        heart.draw()
+    for i in range(player.hearts, 3):
+        heart = Heart('empty-heart', topleft = (10 + i * 64, 10))
+        heart.draw()
+    if player.hearts == 0:
+        screen.draw.text("Всё ты проиграл:(", center=(WIDTH / 2, HEIGHT / 2), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
 
 
 def sorted_by_y_and_type():
@@ -174,6 +182,8 @@ def sorted_by_y_and_type():
 
 def update():
     global player, monsters, obstacles
+    if player.hearts == 0:
+         return
     for monster in monsters:
         monster.move(obstacles)
         if player.colliderect(monster):

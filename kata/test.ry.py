@@ -2,6 +2,15 @@ class Countre:
 
     def __init__(self, c):
         self.c = c
+
+    def vowels(self):
+        vowels = ["a", "e", "y", "u", "i", "o"]
+        vowels_count = 0
+        for char in self.c:
+            if char.lower() in vowels:
+                vowels_count += 1
+        return vowels_count
+
     def count(self):
         d = len(self.c)
         return d
@@ -9,7 +18,7 @@ class Countre:
     def count_word(self):
         recount = 0
         for e in self.c:
-           if e == " ":
+            if e == " ":
                 recount = 1
         print(recount + 1)
 
@@ -17,7 +26,6 @@ class Countre:
         print(self.c)
 
 
-mycounter = Countre("hello world")
-mycounter.count_word()
-print(mycounter.count())
-
+mycounter = Countre(input())
+mycounter.vowels()
+print(mycounter.vowels())
