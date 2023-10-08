@@ -46,6 +46,18 @@ class Monster(Actor):
         self.is_hurt = False
         self.is_twincle = False
         self.life = 2
+        self.is_bite = False
+
+    def bite(self, is_player_left):
+        self.is_bite = True
+        if is_player_left:
+            self.image = self.images[2]
+        else:
+            self.image = self.images[3]
+
+    def stop_bite(self):
+        self.is_bite = False
+        self.image = self.images[self.current_image]
 
     def move(self, obstacles):
         self.x += self.direction
@@ -53,7 +65,7 @@ class Monster(Actor):
             if obstacle.colliderect(self):
                 self.direction *= -1
                 self.x += self.direction
-                self.current_image = (self.current_image + 1) % len(self.images)
+                self.current_image = ((self.current_image + 1) % len(self.images)) % 2
                 self.image = self.images[self.current_image]
 
     def hurt(self):
