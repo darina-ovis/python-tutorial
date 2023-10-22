@@ -54,6 +54,7 @@ obstacles = []
 visible = []
 player: Player = None
 monsters = []
+is_paused = False
 
 
 def init():
@@ -171,7 +172,10 @@ def draw():
         heart = Heart('empty-heart', topleft = (10 + i * 64, 10))
         heart.draw()
     if player.hearts == 0:
-        screen.draw.text("Всё ты проиграл:(", center=(WIDTH / 2, HEIGHT / 2), fontsize=70, color="#eab676", shadow=(1, 1), scolor="#e28743")
+        screen.draw.text("Всё ты проиграл:(", center=(WIDTH / 2, HEIGHT / 2), fontsize=70, color="#000099")
+        return
+    if is_paused:
+        screen.draw.text("Время остановлено", center=(WIDTH / 2, HEIGHT / 2), fontsize=70, color="#000099")
 
 
 def sorted_by_y_and_type():
@@ -182,7 +186,7 @@ def sorted_by_y_and_type():
 
 def update():
     global player, monsters, obstacles
-    if player.hearts == 0:
+    if player.hearts == 0 or is_paused:
          return
     for monster in monsters:
         monster.move(obstacles)
@@ -217,9 +221,20 @@ def update():
         for monster in dead_monsters:
             monsters.remove(monster)
 
+def set_pause():
+    global is_paused
+    is_paused = not is_paused
+    print(is_paused)
+
 
 def on_key_down(key):
-    global player
+    global player, is_paused
+    if player.hearts == 0:
+        return
+    if key == keys.ESCAPE:
+        set_pause()
+    if is_paused:
+        return
     if key == keys.SPACE:
         if player.shooting:
             return
