@@ -190,6 +190,7 @@ def update():
          return
     for monster in monsters:
         monster.move(obstacles)
+        clock.schedule(monster.change_image, 3.0)
         if player.colliderect(monster):
             player.hurt()
             monster.bite(player.x < monster.x)
@@ -231,6 +232,7 @@ def on_key_down(key):
     global player, is_paused
     if player.hearts == 0:
         return
+
     if key == keys.ESCAPE:
         set_pause()
     if is_paused:

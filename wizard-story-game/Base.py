@@ -68,6 +68,11 @@ class Monster(Actor):
                 self.current_image = ((self.current_image + 1) % len(self.images)) % 2
                 self.image = self.images[self.current_image]
 
+
+    def change_image(self):
+        print("Тут должна быть ваша картинка")
+
+
     def hurt(self):
         if self.is_hurt:
             return
