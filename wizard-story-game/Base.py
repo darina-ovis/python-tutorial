@@ -49,11 +49,14 @@ class Monster(Actor):
         self.is_bite = False
 
     def bite(self, is_player_left):
+        if len(self.images) < 2 or self.is_bite:
+            return
         self.is_bite = True
         if is_player_left:
-            self.image = self.images[2]
+            self.current_image = 6
         else:
-            self.image = self.images[3]
+            self.current_image = 4
+        self.image = self.images[self.current_image]
 
     def stop_bite(self):
         self.is_bite = False
@@ -65,13 +68,21 @@ class Monster(Actor):
             if obstacle.colliderect(self):
                 self.direction *= -1
                 self.x += self.direction
-                self.current_image = ((self.current_image + 1) % len(self.images)) % 2
+                self.current_image = ((self.current_image + 2) % len(self.images)) % 2
+                if self.direction < 0 and len(self.images) > 2:
+                    self.current_image += 2
                 self.image = self.images[self.current_image]
 
 
     def change_image(self):
-        print("Тут должна быть ваша картинка")
-
+        if len(self.images) < 2:
+            return
+        print(f'change_image {self.current_image}')
+        if self.current_image % 2 == 0:
+            self.current_image += 1
+        else:
+            self.current_image -= 1
+        self.image = self.images[self.current_image]
 
     def hurt(self):
         if self.is_hurt:

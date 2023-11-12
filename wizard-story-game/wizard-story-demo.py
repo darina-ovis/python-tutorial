@@ -106,7 +106,7 @@ def init():
                 monsters.append(snake)
                 visible.append(snake)
             elif col == 'w':
-                wolf = Monster(['wolf-right', 'wolf-left', 'wolf-left-bite', 'wolf-right-bite'], topleft=(x_index * TILE, y_index * TILE))
+                wolf = Monster(['wolf-right', 'wolf-right2', 'wolf-left', 'wolf-left2', 'wolf-right-bite','wolf-right2', 'wolf-left-bite',  'wolf-left2'], topleft=(x_index * TILE, y_index * TILE))
                 visible.append(wolf)
                 monsters.append(wolf)
     if player is None:
@@ -190,7 +190,7 @@ def update():
          return
     for monster in monsters:
         monster.move(obstacles)
-        clock.schedule(monster.change_image, 3.0)
+        clock.schedule(monster.change_image, 1.0)
         if player.colliderect(monster):
             player.hurt()
             monster.bite(player.x < monster.x)
