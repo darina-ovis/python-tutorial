@@ -109,6 +109,7 @@ def init():
                 wolf = Monster(['wolf-right', 'wolf-right2', 'wolf-left', 'wolf-left2', 'wolf-right-bite','wolf-right2', 'wolf-left-bite',  'wolf-left2'], topleft=(x_index * TILE, y_index * TILE))
                 visible.append(wolf)
                 monsters.append(wolf)
+                clock.schedule_interval(wolf.change_image, 0.2)
     if player is None:
         player = Player(topleft=(WIDTH // 2, HEIGHT // 2))
         visible.append(player)
@@ -190,7 +191,6 @@ def update():
          return
     for monster in monsters:
         monster.move(obstacles)
-        clock.schedule(monster.change_image, 1.0)
         if player.colliderect(monster):
             player.hurt()
             monster.bite(player.x < monster.x)
@@ -206,8 +206,10 @@ def update():
     visible.append(player)
 
     if player.shooting:
-        player.attack.x += player.attack.direction.x * 2 - pos.x
-        player.attack.y += player.attack.direction.y * 2 - pos.y
+        if player.attack.direction.magnitude() != 0:
+            player.attack.direction = player.attack.direction.normalize()
+        player.attack.x += player.attack.direction.x * 5 - pos.x
+        player.attack.y += player.attack.direction.y * 5 - pos.y
 
         dead_monsters = []
         for monster in monsters:
